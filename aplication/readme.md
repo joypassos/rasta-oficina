@@ -38,9 +38,10 @@ Deploy do Aplicativo:
 Crie um arquivo deployment.yaml para definir o deployment do contêiner.
 Use kubectl para aplicar a configuração:
 
-´´
+´´´bash
 kubectl apply -f deployment.yaml
-´´
+´´´
+
 4. Configuração do Load Balancer
 Criar e Configurar Load Balancer:
 
