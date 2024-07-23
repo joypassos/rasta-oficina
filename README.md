@@ -81,7 +81,8 @@ Feedback Collection and Improvement Planning.
 *Load Balancing*
 * OCI Load Balancer: Distribute traffic among application instances for high availability.
 
-*Data Integration*
+**Data Integration**
+
 *Oracle Data Integration*:
 * Data Source Connection: Social media APIs, existing database.
 * Ingestion Pipelines: Automated processes for data collection.
