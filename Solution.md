@@ -68,44 +68,7 @@ Feedback Collection and Improvement Planning.
 
 **Architecture Solution Diagram**
 
-           +---------------------+
-           |   End Users         |
-           +---------------------+
-                     |
-                     |
-            +--------v---------+
-            | OCI Load Balancer|
-            +--------+---------+
-                     |
-         +-----------+----------+
-         |                      |   
-+--------v--------+    +--------v--------+
-|  OKE (App Tier) |    | OKE (App Tier)  |
-+--------+--------+    +--------+--------+
-         |                      |
-         +-----------+----------+
-                     |
-              +------v-------+ 
-              | OCI Compute  |
-              | (App Server) |
-              +------+-------+
-                     |
-        +------------v-------------+
-        |    Oracle Data Integration |
-        +------------+-------------+ 
-                     | 
-     +---------------+----------------+ 
-     |               |                | 
-+----v----+    +-----v-----+    +-----v-----+ 
-| Social  |    | Oracle    |    | Oracle    |
-| Media   |    | Autonomous|    | Object    |
-| APIs    |    | Database  |    | Storage   |
-+---------+    +-----------+    +-----------+
-
-           +---------------------+
-           | Oracle Analytics    |
-           | Cloud               |
-           +---------------------+
+![alt text](image.png)
 
 
 **Diagram Description**
