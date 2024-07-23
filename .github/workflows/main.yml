@@ -6,7 +6,7 @@ on:
       - main  # ajuste conforme necessário
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,10 +17,10 @@ jobs:
         run: |
           echo ${{ secrets.OCI_REGISTRY_PASSWORD }} | docker login -u ${{ secrets.OCI_REGISTRY_USERNAME }} --password-stdin gru.ocir.io
 
-      - name: Build and Push Docker image
+      - name: Build Docker image
         run: |
-          docker build -t gru.ocir.io/<tenancy-namespace>/<nome-do-repositório>/<nome-da-imagem>:latest .
-          docker push gru.ocir.io/<tenancy-namespace>/<nome-do-repositório>/<nome-da-imagem>:latest
+          docker build -t gru.ocir.io/grzmxlhavk8p/oracle-oci-testes/dockerteste:latest .
+          docker push gru.ocir.io/grzmxlhavk8p/oracle-oci-testes/dockerteste:latest
 
       - name: Configure kubectl
         uses: azure/k8s-set-context@v1
