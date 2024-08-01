@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: survey-app
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: survey-app
@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: survey-app
-        image: ${{ secrets.OCI_REPO }}:latest
+        image: gru.ocir.io:latest  # Substitua [OCI_REPO] pelo nome do repositório OCI
         ports:
         - containerPort: 5000
         env:
