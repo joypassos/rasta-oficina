@@ -41,10 +41,16 @@ jobs:
         chmod +x install.sh
         ./install.sh --accept-all-defaults
 
+    - name: Install kubectl
+      run: |
+        curl -LO "https://dl.k8s.io/release/v1.26.3/bin/linux/amd64/kubectl"
+        chmod +x ./kubectl
+        sudo mv ./kubectl /usr/local/bin/kubectl
+
     - name: Configure kubectl
-      uses: oracle-actions/kubectl@v1.0.0
-      with:
-        kubeconfig: ${{ secrets.KUBE_CONFIG }}
+      run: |
+        mkdir -p $HOME/.kube
+        echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
 
     - name: Deploy to Kubernetes
       run: |
