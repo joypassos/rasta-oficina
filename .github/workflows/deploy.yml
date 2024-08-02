@@ -29,6 +29,11 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps: 
+      - name: Install OCI CLI
+        run: |
+          curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh | bash -s -- --accept-all-defaults
+          echo 'export PATH=$PATH:/home/runner/.local/bin' >> $GITHUB_ENV
+       
       - name: 'Write Config & Key Files'
         run: |
           mkdir ~/.oci
@@ -38,21 +43,8 @@ jobs:
           echo "tenancy=${{secrets.OCI_TENANCY_OCID}}" >> ~/.oci/config
           echo "region=${{secrets.OCI_CLI_REGION}}" >> ~/.oci/config         
           echo "${{secrets.OCI_CLI_KEY_CONTENT}}" >> ~/.oci/key.pem
-          echo "key_file=~/.oci/key.pem" >> ~/.oci/config    
-          
-      - name: Install OCI CLI
-        run: |
-          curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh
-          chmod +x install.sh
-          ./install.sh --accept-all-defaults
-          echo "::add-path::/home/runner/bin"
-          exec -l $SHELL
-          
-      - name: Fix Config File Permissions
-        run: |
-          oci setup repair-file-permissions --file ~/.oci/key.pem
-          oci setup repair-file-permissions --file ~/.oci/config
-      
+          echo "key_file=~/.oci/key.pem" >> ~/.oci/config              
+       
       - name: Configure Kubectl
         uses: oracle-actions/configure-kubectl-oke@v1.5.0
         id: kubectl-oke-action
