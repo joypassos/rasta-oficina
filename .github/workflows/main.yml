@@ -21,7 +21,7 @@ jobs:
       uses: oracle-actions/get-ocir-repository@v1.3.0
       with:
         compartment: ${{ secrets.OCI_COMPARTMENT_OCID }}
-        region: ${{ secrets.OCI_REGION }}
+        name: ${{ secrets.OCI_REPO }}
 
 
     - name: Login to OCI Container Registry
