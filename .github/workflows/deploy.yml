@@ -41,6 +41,8 @@ jobs:
     - name: Install OCI CLI
       run: |
         curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh | bash -s -- --accept-all-defaults
+        echo 'export PATH=$PATH:/home/runner/bin' >> $HOME/.bashrc
+        source $HOME/.bashrc
 
     - name: Configure OCI CLI
       run: |
