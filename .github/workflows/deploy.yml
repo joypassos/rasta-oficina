@@ -45,7 +45,8 @@ jobs:
 
     - name: Deploy to Kubernetes
       run: |
-        ls my-survey-app -l
+        kubectl creat secret docker-registry ocirsecret --docker-server=${{ secrets.OCI_REGION }}.ocir.io --docker-username='${{ secrets.OCI_NAMESPACE }}/${{ secrets.OCI_USER_MAIL }}' --docker-password=:'${{ secrets.OCI_AUTH_TOKEN }}'
+        cd my-survey-app 
         kubectl apply -f deployment.yaml
         kubectl apply -f service.yaml
     
