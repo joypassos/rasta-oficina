@@ -29,24 +29,29 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps: 
+      - name: 'Write Config & Key Files'
+        run: |
+          mkdir ~/.oci
+          echo "[DEFAULT]" >> ~/.oci/config
+          echo "user=${{secrets.OCI_USER_OCID}}" >> ~/.oci/config
+          echo "fingerprint=${{secrets.OCI_CLI_FINGERPRINT}}" >> ~/.oci/config
+          echo "tenancy=${{secrets.OCI_TENANCY_OCID}}" >> ~/.oci/config
+          echo "region=${{secrets.OCI_CLI_REGION}}" >> ~/.oci/config         
+          echo "${{secrets.OCI_CLI_KEY_CONTENT}}" >> ~/.oci/key.pem
+          echo "key_file=~/.oci/key.pem" >> ~/.oci/config    
+          
       - name: Install OCI CLI
         run: |
-          curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh | bash -s -- --accept-all-defaults
-          echo 'export PATH=$PATH:/home/runner/.local/bin' >> $GITHUB_ENV
-
-
-      - name: Configure OCI CLI
-        env:
-          OCI_CLI_USER: ${{ secrets.OCI_USER_OCID }}
-          OCI_CLI_TENANCY: ${{ secrets.OCI_TENANCY_OCID }}
-          OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
-          OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
-          OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
+          curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh
+          chmod +x install.sh
+          ./install.sh --accept-all-defaults
+          echo "::add-path::/home/runner/bin"
+          exec -l $SHELL
+          
+      - name: Fix Config File Permissions
         run: |
-          mkdir -p ~/.oci
-          echo "${{ secrets.OCI_CLI_KEY_CONTENT }}" > ~/.oci/oci_api_key.pem
-          chmod 600 ~/.oci/oci_api_key.pem
-          oci setup config --config-file ~/.oci/config --tenancy-id $OCI_TENANCY_OCID --region $OCI_CLI_REGION --user-id $OCI_USER_OCID--fingerprint $OCI_CLI_FINGERPRINT --private-key-path ~/.oci/oci_api_key.pem
+          oci setup repair-file-permissions --file ~/.oci/key.pem
+          oci setup repair-file-permissions --file ~/.oci/config
       
       - name: Configure Kubectl
         uses: oracle-actions/configure-kubectl-oke@v1.5.0
