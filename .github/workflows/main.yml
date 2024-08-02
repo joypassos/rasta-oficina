@@ -20,8 +20,7 @@ jobs:
       uses: oracle-actions/login-ocir@v1.3.0
       with:  
         auth_token: ${{ secrets.OCI_AUTH_TOKEN }} 
-        region: gru.ocir.io
-
+        region: 'gru.ocir.io'
 
     - name: Build and push Docker image to OCI
       run: |
