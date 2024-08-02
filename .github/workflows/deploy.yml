@@ -28,29 +28,21 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    steps: 
-      - name: Install OCI CLI
-        run: |
-          curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh | bash -s -- --accept-all-defaults
-          echo 'export PATH=$PATH:/home/runner/.local/bin' >> $GITHUB_ENV
-       
-      - name: 'Write Config & Key Files'
-        run: |
-          mkdir ~/.oci
-          echo "[DEFAULT]" >> ~/.oci/config
-          echo "user=${{secrets.OCI_USER_OCID}}" >> ~/.oci/config
-          echo "fingerprint=${{secrets.OCI_CLI_FINGERPRINT}}" >> ~/.oci/config
-          echo "tenancy=${{secrets.OCI_TENANCY_OCID}}" >> ~/.oci/config
-          echo "region=${{secrets.OCI_CLI_REGION}}" >> ~/.oci/config         
-          echo "${{secrets.OCI_CLI_KEY_CONTENT}}" >> ~/.oci/key.pem
-          echo "key_file=~/.oci/key.pem" >> ~/.oci/config              
-       
+    name: Install Kubectl for OKE
+    env:
+      OCI_CLI_USER: ${{ secrets.OCI_USER_OCID }}
+      OCI_CLI_TENANCY: ${{ secrets.OCI_TENANCY_OCID }}
+      OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
+      OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
+      OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
+
+    steps:
       - name: Configure Kubectl
         uses: oracle-actions/configure-kubectl-oke@v1.5.0
-        id: kubectl-oke-action
+        id: test-configure-kubectl-oke-action
         with:
           cluster: ${{ secrets.OKE_CLUSTER_OCID }}
-          
+            
       - name: Deploy to Kubernetes
         run: |
          cd my-survey-app
