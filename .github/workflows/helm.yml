@@ -48,6 +48,5 @@ jobs:
           
       - name: Deploy to Kubernetes
         run: |
-         cd my-survey-app
          kubectl apply -f deployment.yaml
          kubectl apply -f service.yaml
