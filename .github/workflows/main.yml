@@ -22,7 +22,7 @@ jobs:
       with:
         compartment: ${{ secrets.OCI_COMPARTMENT_OCID }}
         name: ${{ secrets.OCI_REPO }}
-
+        region: ${{ secrets.OCI_REGION }}
 
     - name: Login to OCI Container Registry
       uses: oracle-actions/login-ocir@v1.3.0
