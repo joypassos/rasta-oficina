@@ -2,8 +2,7 @@ name: Deploy to Kubernetes
 
 on:
   push:
-    branches:
-      - main
+    branches: ['main']
   workflow_dispatch:
 
 jobs:
@@ -16,13 +15,6 @@ jobs:
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
-
-    - name: Retornar a URI r OCID do Registry (OCIR) repository 
-      uses: oracle-actions/get-ocir-repository@v1.3.0
-      with:
-        compartment: ${{ secrets.OCI_COMPARTMENT_OCID }}
-        name: ${{ secrets.OCI_REPO }}
-        region: ${{ secrets.OCI_REGION }}
 
     - name: Login to OCI Container Registry
       uses: oracle-actions/login-ocir@v1.3.0
