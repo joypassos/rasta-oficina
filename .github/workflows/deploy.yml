@@ -41,12 +41,12 @@ jobs:
     - name: Configure kubectl with OCI CLI
       run: |
         mkdir -p $HOME/.kube
-        echo "${{ secrets.KUBE_CONFIG }}" --file $HOME/.kube/config --region ${{ secrets.OCI_REGION }} --token-version 2.0.0 --kube-endpoint PUBLIC_ENDPOINT
+        echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
 
     - name: Deploy to Kubernetes
       run: |     
          cd my-survey-app
-         echo "${{ secrets.KUBE_CONFIG }}"
+         echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
          kubectl apply -f deployment.yaml
          kubectl apply -f service.yaml
 
