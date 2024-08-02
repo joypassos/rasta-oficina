@@ -40,12 +40,8 @@ jobs:
         id: kubectl-oke-action
         with:
           cluster: ${{ secrets.OKE_CLUSTER_OCID }}      
-      - name: Helm deploy
-        id: helm-deploy
-        run: |
-          helm upgrade \
-            demo chart/ \
-            --install --wait \
-            --values chart/demo.yaml \
-            --set image.tag=${{ github.sha }} \
-            --namespace demo
+      - name: Deploy to Kubernetes
+      run: |
+        cd my-survey-app
+        kubectl apply -f deployment.yaml
+        kubectl apply -f service.yaml
