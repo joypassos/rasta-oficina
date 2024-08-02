@@ -1,14 +1,12 @@
 name: Deploy to Kubernetes
-
 on:
   push:
     branches: ["main"]
   workflow_dispatch:
-
+  
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -22,6 +20,7 @@ jobs:
 
     - name: Build and push Docker image to OCI
       run: |
+        cd my-survey-app
         docker build -t gru.ocir.io/grzmxlhavk8p/oracle-oci-testes/my-survey-app:latest .
         docker push gru.ocir.io/grzmxlhavk8p/oracle-oci-testes/my-survey-app:latest
 
@@ -44,5 +43,6 @@ jobs:
 
     - name: Deploy to Kubernetes
       run: |
+        cd my-survey-app
         kubectl apply -f deployment.yaml
         kubectl apply -f service.yaml
