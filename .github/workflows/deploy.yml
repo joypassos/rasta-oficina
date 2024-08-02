@@ -42,6 +42,8 @@ jobs:
       run: |
         curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh | bash -s -- --accept-all-defaults
         echo 'export PATH=$PATH:/home/runner/bin' >> $HOME/.bashrc
+        source $HOME/.bashrc
+        oci config profile default
 
     - name: Configure kubectl with OCI CLI
       run: |
