@@ -34,10 +34,6 @@ jobs:
         run: |
          mkdir -p $HOME/.kube
          echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config 
-         
-      - name: List Kubernetes Secrets
-        run: |
-          kubectl get secrets
           
       - name: Deploy to Kubernetes
         run: |
