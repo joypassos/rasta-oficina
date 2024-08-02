@@ -32,18 +32,19 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4.1.7
-
+      
     - name: Install kubectl
       run: |
         curl -LO "https://dl.k8s.io/release/v1.26.3/bin/linux/amd64/kubectl"
         chmod +x ./kubectl
         sudo mv ./kubectl /usr/local/bin/kubectl
-
-    - name: Configure kubectl
-      run: |
-        mkdir -p $HOME/.kube
-        echo "${{ secrets.KUBE_CONFIG }}" --file $HOME/.kube/config --region sa-saopaulo-1 --token-version 2.0.0  --kube-endpoint PUBLIC_ENDPOINT
         
+    - name: Configure kubectl
+      uses: azure/k8s-set-context@v1
+      with:
+        kubeconfig: ${{ secrets.KUBE_CONFIG }} --file $HOME/.kube/config --region sa-saopaulo-1 --token-version 2.0.0  --kube-endpoint PUBLIC_ENDPOINT
+
+       
     - name: Deploy to Kubernetes
       run: |
         cd my-survey-app
