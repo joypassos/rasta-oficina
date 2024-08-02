@@ -2,7 +2,7 @@ name: Deploy to Kubernetes
 
 on:
   push:
-    branches: ['main']
+    branches: ["main"]
   workflow_dispatch:
 
 jobs:
@@ -15,17 +15,15 @@ jobs:
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
-          
-    - name: Login to OCI Container Registry
-      uses: oracle-actions/login-ocir@v1.3.0
-      with:  
-        auth_token: ${{ secrets.OCI_AUTH_TOKEN }} 
-        region: 'gru.ocir.io'
+
+    - name: Login to Oracle Cloud Infrastructure Registry (OCIR)
+      run: |
+        echo "${{ secrets.OCI_AUTH_TOKEN }}" | docker login -u 'grzmxlhavk8p/joyce.passos@zup.com.br' gru.ocir.io --password-stdin
 
     - name: Build and push Docker image to OCI
       run: |
-        docker build . -t ${{ secrets.OCI_REPO }}:latest
-        docker push ${{ secrets.OCI_REPO }}:latest
+        docker build -t gru.ocir.io/grzmxlhavk8p/oracle-oci-testes/my-survey-app:latest .
+        docker push gru.ocir.io/grzmxlhavk8p/oracle-oci-testes/my-survey-app:latest
 
   deploy:
     runs-on: ubuntu-latest
