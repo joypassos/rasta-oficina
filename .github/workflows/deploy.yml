@@ -26,27 +26,28 @@ jobs:
         
   
   deploy:
-    needs: build
     runs-on: ubuntu-latest
-    steps:    
-               
-      - name: Configure Kubectl
-        uses: oracle-actions/configure-kubectl-oke@v1.5.0
-        id: kubectl-oke-action
-        with:
-          cluster: ${{ secrets.OKE_CLUSTER_OCID }}
-        env: 
-          TF_VAR_user_ociid: ${{ secrets.OCI_CLI_USER }}
-          TF_VAR_fingerprint: ${{ secrets.OCI_CLI_FINGERPRINT }}
-          TF_VAR_tenancy_ociid: ${{ secrets.OCI_CLI_TENANCY }}
-          TF_VAR_region: ${{ secrets.OCI_REGION }}
-          TF_VAR_key_content: ${{ secrets.OCI_CLI_KEY_CONTENT }}  
+    needs: build
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4.1.7
+
+    - name: Install kubectl
+      run: |
+        curl -LO "https://dl.k8s.io/release/v1.26.3/bin/linux/amd64/kubectl"
+        chmod +x ./kubectl
+        sudo mv ./kubectl /usr/local/bin/kubectl
+    - name: Configure kubectl with OCI CLI
+      run: |
+        mkdir -p $HOME/.kube
+        echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
           
-      - name: Deploy to Kubernetes
-        run: |
-         cd my-survey-app
-         kubectl get nodes
-         kubectl apply -f deployment.yaml --request-timeout='2m'
-         kubectl get pods
-         kubectl apply -f service.yaml --request-timeout='2m'
-         kubectl get service
+    - name: Deploy to Kubernetes
+      run: |
+        cd my-survey-app
+        kubectl get nodes
+        kubectl apply -f deployment.yaml --request-timeout='2m'
+        kubectl get pods
+        kubectl apply -f service.yaml --request-timeout='2m'
+        kubectl get service
