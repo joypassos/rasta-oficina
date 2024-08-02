@@ -18,7 +18,7 @@ jobs:
     - name: Login to Oracle Cloud Infrastructure Registry (OCIR)
       uses: oracle-actions/login-ocir@v1.3.0
       with:
-        auth_token: ${{ secrets.OCI_AUTH_TOKEN }}
+        auth_token: ${{ secrets.OCI_AUTH_TOKEN }} | docker login -u "${{ secrets.OCI_NAMESPACE }}/${{ secrets.OCI_USER_MAIL }}" ${{ secrets.OCI_REGION }}.ocir.io --password-stdin
 
     - name: Build and push Docker image to OCI
       run: |
