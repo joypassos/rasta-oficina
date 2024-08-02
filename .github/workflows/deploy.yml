@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps: 
       - name: Enviar variaveis
-        run: echo "[DEFAULT]" >> ~/.oci/config
+        run: echo "Setting environment variables"
         env: 
           TF_VAR_user_ociid: ${{ secrets.OCI_CLI_USER }}
           TF_VAR_fingerprint: ${{ secrets.OCI_CLI_FINGERPRINT }}
