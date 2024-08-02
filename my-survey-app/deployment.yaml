@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: survey-app
-        image: gru.ocir.io:latest  # Substitua [OCI_REPO] pelo nome do repositório OCI
+        image: gru.ocir.io/grzmxlhavk8p/my-survey-app:latest
         ports:
         - containerPort: 5000
         env:
