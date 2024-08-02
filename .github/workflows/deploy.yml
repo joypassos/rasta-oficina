@@ -38,6 +38,19 @@ jobs:
         chmod +x ./kubectl
         sudo mv ./kubectl /usr/local/bin/kubectl
 
+    - name: Install OCI CLI
+      run: |
+        curl -LO "https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh"
+        chmod +x install.sh
+        ./install.sh --accept-all-defaults
+
+    - name: Configure OCI CLI
+      run: |
+        mkdir -p ~/.oci
+        echo "${{ secrets.OCI_CONFIG }}" > ~/.oci/config
+        echo "${{ secrets.OCI_KEY }}" > ~/.oci/oci_api_key.pem
+        chmod 600 ~/.oci/oci_api_key.pem
+
     - name: Configure kubectl with OCI CLI
       run: |
         mkdir -p $HOME/.kube
@@ -48,5 +61,5 @@ jobs:
         cd my-survey-app
         kubectl apply -f deployment.yaml
         kubectl apply -f service.yaml
-  env:
-    KUBECONFIG: $HOME/.kube/config
+    env:
+      KUBECONFIG: $HOME/.kube/config
