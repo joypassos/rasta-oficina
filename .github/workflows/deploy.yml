@@ -3,7 +3,7 @@ on:
   push:
     branches: ["main"]
   workflow_dispatch:
-  
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,13 +16,13 @@ jobs:
 
     - name: Login to Oracle Cloud Infrastructure Registry (OCIR)
       run: |
-        echo "${{ secrets.OCI_AUTH_TOKEN }}" | docker login -u 'grzmxlhavk8p/joyce.passos@zup.com.br' gru.ocir.io --password-stdin
+        echo "${{ secrets.OCI_AUTH_TOKEN }}" | docker login -u "${{ secrets.OCI_NAMESPACE }}/${{ secrets.OCI_USER_MAIL }}" ${{ secrets.OCI_REGION }}.ocir.io --password-stdin
 
     - name: Build and push Docker image to OCI
       run: |
         cd my-survey-app
-        docker build -t gru.ocir.io/grzmxlhavk8p/oracle-oci-testes/my-survey-app:latest .
-        docker push gru.ocir.io/grzmxlhavk8p/oracle-oci-testes/my-survey-app:latest
+        docker build -t ${{ secrets.OCI_REGION }}.ocir.io/${{ secrets.OCI_NAMESPACE }}/${{ secrets.NAME_REPO }}/my-survey-app:latest .
+        docker push ${{ secrets.OCI_REGION }}.ocir.io/${{ secrets.OCI_NAMESPACE }}/${{ secrets.NAME_REPO }}/my-survey-app:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -36,6 +36,10 @@ jobs:
       uses: azure/setup-kubectl@v1
       with:
         version: 'latest'
+
+    - name: Create .kube directory
+      run: |
+        mkdir -p $HOME/.kube
 
     - name: Configure kubectl
       run: |
