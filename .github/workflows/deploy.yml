@@ -37,7 +37,11 @@ jobs:
         curl -LO "https://dl.k8s.io/release/v1.26.3/bin/linux/amd64/kubectl"
         chmod +x ./kubectl
         sudo mv ./kubectl /usr/local/bin/kubectl
-    
+
+    - name: Install OCI CLI
+      run: |
+        curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh | bash -s -- --accept-all-defaults
+
     - name: Configure kubectl with OCI CLI
       run: |
         mkdir -p $HOME/.kube
@@ -45,8 +49,7 @@ jobs:
 
     - name: Deploy to Kubernetes
       run: |
-        kubectl create secret docker-registry ocirsecret --docker-server=${{ secrets.OCI_REGION }}.ocir.io --docker-username='stackspot/${{ secrets.OCI_USER_MAIL }}' --docker-password=:'${{ secrets.OCI_AUTH_TOKEN }}'
-        cd my-survey-app 
+        kubectl create secret docker-registry ocirsecret --docker-server=${{ secrets.OCI_REGION }}.ocir.io --docker-username='${{ secrets.OCI_NAMESPACE }}/${{ secrets.OCI_USER_MAIL }}' --docker-password='${{ secrets.OCI_AUTH_TOKEN }}'
+        cd my-survey-app
         kubectl apply -f deployment.yaml
         kubectl apply -f service.yaml
-    
