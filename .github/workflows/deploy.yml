@@ -24,25 +24,25 @@ jobs:
         docker build -t ${{ secrets.OCI_REGION }}.ocir.io/${{ secrets.OCI_NAMESPACE }}/${{ secrets.NAME_REPO }}/my-survey-app:latest .
         docker push ${{ secrets.OCI_REGION }}.ocir.io/${{ secrets.OCI_NAMESPACE }}/${{ secrets.NAME_REPO }}/my-survey-app:latest      
         
-  
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    steps:
-      - name: Install Kubectl for OKE
+    steps: 
+        
+      - name: Configure OCI CLI
         env:
           OCI_CLI_USER: ${{ secrets.OCI_USER_OCID }}
           OCI_CLI_TENANCY: ${{ secrets.OCI_TENANCY_OCID }}
-          OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
-          OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
-          OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
-          
+          OCI_CLI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
+          OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_KEY_CONTENT }}
+          OCI_CLI_REGION: ${{ secrets.OCI_REGION }}
+      
       - name: Configure Kubectl
         uses: oracle-actions/configure-kubectl-oke@v1.5.0
-        id: test-configure-kubectl-oke-action
+        id: kubectl-oke-action
         with:
           cluster: ${{ secrets.OKE_CLUSTER_OCID }}
-            
+          
       - name: Deploy to Kubernetes
         run: |
          cd my-survey-app
@@ -51,7 +51,3 @@ jobs:
          kubectl get pods
          kubectl apply -f service.yaml --request-timeout='2m'
          kubectl get service
-
-
-
-
