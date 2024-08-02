@@ -45,8 +45,7 @@ jobs:
 
     - name: Deploy to Kubernetes
       run: |
-        echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
-        cd my-survey-app
+        ls -l
         kubectl apply -f deployment.yaml
         kubectl apply -f service.yaml
     
