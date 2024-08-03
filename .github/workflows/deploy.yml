@@ -19,21 +19,10 @@ jobs:
       run: |
         echo "${{ secrets.OCI_AUTH_TOKEN }}" | docker login -u "${{ secrets.OCI_NAMESPACE }}/${{ secrets.OCI_USER_MAIL }}" ${{ secrets.OCI_REGION }}.ocir.io --password-stdin        
         
-    - name: Build Docker image
-      uses: docker/build-push-action@v6
-      with:
-        platforms: linux/arm64
-        path: my-survey-app
-        context: .
-        file: Dockerfile
-        tags: ${{ secrets.OCI_REGION }}.ocir.io/${{ secrets.OCI_NAMESPACE }}/${{ secrets.NAME_REPO }}/my-survey-app:latest
-        push: false
-        load: true
-        cache-from: type=gha
-        cache-to: type=gha,mode=max      
-     
-    - name: Push Docker Image to Oracle Cloud Registry
+    - name: Build and push Docker image to OCI
       run: |
+        cd my-survey-app
+        docker build -t ${{ secrets.OCI_REGION }}.ocir.io/${{ secrets.OCI_NAMESPACE }}/${{ secrets.NAME_REPO }}/my-survey-app:latest .
         docker push ${{ secrets.OCI_REGION }}.ocir.io/${{ secrets.OCI_NAMESPACE }}/${{ secrets.NAME_REPO }}/my-survey-app:latest  
 
   deploy:
