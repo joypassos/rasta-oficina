@@ -1,27 +1,27 @@
 from flask import Flask, request, jsonify
-import psycopg2
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-def get_db_connection():
-    conn = psycopg2.connect(
-        dbname='dbtestepq',
-        user='admin',
-        password='123456@Aadbc',
-        host='10.0.1.176'
-    )
-    return conn
+# Configure database connection
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://admin:123456@Aadbc@10.0.1.176:port/dbtestepq"
+db = SQLAlchemy(app)
 
-@app.route('/survey', methods=['POST'])
-def create_survey():
-    data = request.json
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('INSERT INTO surveys (question) VALUES (%s)', (data['question'],))
-    conn.commit()
-    cur.close()
-    conn.close()
-    return jsonify({'status': 'survey created'}), 201
+# Define the table for the database
+class SearchRequest(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    query = db.Column(db.String(100), nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+@app.route("/search", methods=["GET"])
+def search():
+    query = request.args.get("query")
+    if query:
+        search_request = SearchRequest(query=query)
+        db.session.add(search_request)
+        db.session.commit()
+        return jsonify({"message": "Search request saved successfully"})
+    return jsonify({"message": "Invalid request"}), 400
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)

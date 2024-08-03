@@ -1,5 +1,5 @@
--- Criação de uma tabela para armazenar as respostas da pesquisa
-CREATE TABLE survey_responses (
+CREATE TABLE search_requests (
     id SERIAL PRIMARY KEY,
-    response TEXT NOT NULL
+    query VARCHAR(100) NOT NULL,
+    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
