@@ -19,14 +19,25 @@ jobs:
       run: |
         echo "${{ secrets.OCI_AUTH_TOKEN }}" | docker login -u "${{ secrets.OCI_NAMESPACE }}/${{ secrets.OCI_USER_MAIL }}" ${{ secrets.OCI_REGION }}.ocir.io --password-stdin        
         
-    - name: Build and push Docker image to OCI
+    - name: Build Docker image
+      uses: docker/build-push-action@v6
+      with:
+        platforms: linux/arm64
+        context: .
+        file: Dockerfile
+        tags: ${{ secrets.OCI_REGION }}.ocir.io/${{ secrets.OCI_NAMESPACE }}/${{ secrets.NAME_REPO }}/my-survey-app:latest
+        push: false
+        load: true
+        cache-from: type=gha
+        cache-to: type=gha,mode=max      
+     
+    - name: Push Docker Image to Oracle Cloud Registry
       run: |
-        cd my-survey-app
-        docker build -t ${{ secrets.OCI_REGION }}.ocir.io/${{ secrets.OCI_NAMESPACE }}/${{ secrets.NAME_REPO }}/my-survey-app:latest .
         docker push ${{ secrets.OCI_REGION }}.ocir.io/${{ secrets.OCI_NAMESPACE }}/${{ secrets.NAME_REPO }}/my-survey-app:latest  
 
   deploy:
     needs: build
+    name: Deploy container image to an OKE Cluster
     runs-on: ubuntu-latest
     env:
       OCI_CLI_USER: ${{ secrets.OCI_USER_OCID }}
@@ -34,17 +45,18 @@ jobs:
       OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
       OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
       OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
+      OCI_REGION: ${{ secrets.OCI_REGION }}.ocir.io
 
     steps:
     - name: Configure Kubectl
       uses: oracle-actions/configure-kubectl-oke@v1.5.0
       with:
-        cluster: ocid1.cluster.oc1.sa-saopaulo-1.aaaaaaaa2mbcxhg6mcvpallift6hxf5jxnm26564hbx3xp6x3c6a74hpmjsa
+        cluster: ${{ secrets.OKE_CLUSTER_OCID }}
         
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v4.1.7
             
     - name: Deploy to Kubernetes
       run: |
-       envsubst < my-survey-app/deployment.yaml | kubectl apply -f - -n ${{ env.OCI_NAMESPACE }}
-       envsubst < my-survey-app/service.yaml | kubectl apply -f  - -n ${{ env.OCI_NAMESPACE }}
+       envsubst < deployment.yaml | kubectl apply -f - -n ${{ env.OCI_NAMESPACE }}
+       envsubst < service.yaml | kubectl apply -f  - -n ${{ env.OCI_NAMESPACE }}
