@@ -23,7 +23,7 @@ jobs:
       uses: docker/build-push-action@v6
       with:
         platforms: linux/arm64
-        context: my-survey-app .
+        context: my-survey-app
         file: my-survey-app/Dockerfile
         tags: ${{ secrets.OCI_REGION }}.ocir.io/${{ secrets.OCI_NAMESPACE }}/${{ secrets.NAME_REPO }}/my-survey-app:latest
         push: false
