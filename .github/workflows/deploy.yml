@@ -25,36 +25,26 @@ jobs:
         docker push ${{ secrets.OCI_REGION }}.ocir.io/${{ secrets.OCI_NAMESPACE }}/${{ secrets.NAME_REPO }}/my-survey-app:latest      
 
   deploy:
-    runs-on: ubuntu-latest
     needs: build
+    name: Deploy container image to an OKE Cluster
+    runs-on: ubuntu-latest
+    env:
+      OCI_CLI_USER: ${{ secrets.OCI_USER_OCID }}
+      OCI_CLI_TENANCY: ${{ secrets.OCI_TENANCY_OCID }}
+      OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
+      OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
+      OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4.1.7
-
-    - name: Install kubectl
-      run: |
-        curl -LO "https://dl.k8s.io/release/v1.26.3/bin/linux/amd64/kubectl"
-        chmod +x ./kubectl
-        sudo mv ./kubectl /usr/local/bin/kubectl
-
-    - name: Install OCI CLI
-      run: |
-        curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh | bash -s -- --accept-all-defaults
-        echo 'export PATH=$PATH:/home/runner/bin' >> $HOME/.bashrc
-        source $HOME/.bashrc
-        oci config profile default
-
-    - name: Configure kubectl with OCI CLI
-      run: |
-        mkdir -p $HOME/.kube
-        echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
-
+    - name: Configure Kubectl
+      uses: oracle-actions/configure-kubectl-oke@v1.5.0
+      with:
+        cluster: ${{ secrets.OKE_CLUSTER_OCID }}
+        
+    - name: Checkout
+      uses: actions/checkout@v4
+            
     - name: Deploy to Kubernetes
       run: |
-        cd my-survey-app
-        kubectl get nodes
-        kubectl apply -f deployment.yaml --request-timeout='2m'
-        kubectl get pods
-        kubectl apply -f service.yaml --request-timeout='2m'
-        kubectl get service
+       envsubst < my-survey-app/deployment.yaml | kubectl apply -f - -n ${{ env.OCI_NAMESPACE }}
+       envsubst < my-survey-app/service.yaml | kubectl apply -f  - -n ${{ env.OCI_NAMESPACE }}
