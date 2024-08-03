@@ -38,7 +38,6 @@ jobs:
 
   deploy:
     needs: build
-    name: Deploy container image to an OKE Cluster
     runs-on: ubuntu-latest
     env:
       OCI_CLI_USER: ${{ secrets.OCI_USER_OCID }}
@@ -51,7 +50,7 @@ jobs:
     - name: Configure Kubectl
       uses: oracle-actions/configure-kubectl-oke@v1.5.0
       with:
-        cluster: ${{ secrets.OKE_CLUSTER_OCID }}
+        cluster: ocid1.cluster.oc1.sa-saopaulo-1.aaaaaaaa2mbcxhg6mcvpallift6hxf5jxnm26564hbx3xp6x3c6a74hpmjsa
         
     - name: Checkout
       uses: actions/checkout@v4
