@@ -48,5 +48,6 @@ jobs:
             
     - name: Deploy to Kubernetes
       run: |
-       envsubst < deployment.yaml | kubectl apply -f - -n ${{ env.OCI_NAMESPACE }}
-       envsubst < service.yaml | kubectl apply -f  - -n ${{ env.OCI_NAMESPACE }}
+        envsubst < my-survey-app/deployment.yaml | kubectl apply -f - -n ${{ env.OCI_NAMESPACE }}
+        envsubst < my-survey-app/service.yaml | kubectl apply -f  - -n ${{ env.OCI_NAMESPACE }}
+
