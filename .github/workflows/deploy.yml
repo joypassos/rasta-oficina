@@ -7,6 +7,7 @@ on:
 
 jobs:
   build:
+    name: Build and publish Docker image
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -37,6 +38,7 @@ jobs:
 
   deploy:
     needs: build
+    name: Deploy container image to an OKE Cluster
     runs-on: ubuntu-latest
     env:
       OCI_CLI_USER: ${{ secrets.OCI_USER_OCID }}
