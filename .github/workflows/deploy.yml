@@ -62,5 +62,3 @@ jobs:
         envsubst < kubernetes/deployment.yaml | kubectl apply -f -
         envsubst < kubernetes/service.yaml | kubectl apply -f -
         envsubst < kubernetes/persistent-volume-claim.yaml | kubectl apply -f -
-        envsubst < kubernetes/persistent-volume.yaml | kubectl apply -f -
-
