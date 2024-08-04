@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oficina-mecanica
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: oficina-mecanica
+  template:
+    metadata:
+      labels:
+        app: oficina-mecanica
+    spec:
+      containers:
+      - name: app
+        image: oficina-mecanica:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://user:password@db:5432/oficina_mecanica"
+      - name: db
+        image: postgres
+        env:
+        - name: POSTGRES_USER
+          value: "user"
+        - name: POSTGRES_PASSWORD
+          value: "password"
+        - name: POSTGRES_DB
+          value: "oficina_mecanica"
+        volumeMounts:
+        - name: db-data
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: db-data
+        persistentVolumeClaim:
+          claimName: db-data

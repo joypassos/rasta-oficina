@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: my-survey-app
+  name: oficina-mecanica
 spec:
   selector:
-    app: my-survey-app
+    app: oficina-mecanica
   ports:
   - name: http
-    port: 80
+    port: 5000
     targetPort: 5000
   type: LoadBalancer

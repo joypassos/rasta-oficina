@@ -24,8 +24,8 @@ jobs:
       uses: docker/build-push-action@v6
       with:
         platforms: linux/arm64
-        context: my-survey-app
-        file: my-survey-app/Dockerfile
+        context: .
+        file: Dockerfile
         tags: ${{ secrets.OCI_REGION }}.ocir.io/${{ secrets.OCI_NAMESPACE }}/${{ secrets.NAME_REPO }}/my-survey-app:latest
         push: false
         load: true
@@ -59,6 +59,8 @@ jobs:
             
     - name: Deploy to Kubernetes
       run: |
-        envsubst < my-survey-app/deployment.yaml | kubectl apply -f -
-        envsubst < my-survey-app/service.yaml | kubectl apply -f -
+        envsubst < kubernetes/deployment.yaml | kubectl apply -f -
+        envsubst < kubernetes/service.yaml | kubectl apply -f -
+        envsubst < kubernetes/persistent-volume-claim.yaml | kubectl apply -f -
+        envsubst < kubernetes/persistent-volume.yaml | kubectl apply -f -
 

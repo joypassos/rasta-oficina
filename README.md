@@ -1,28 +1,39 @@
-# Problem Statement
-The project involves migrating an anonymous survey hosting application from a local environment to Oracle Cloud Infrastructure (OCI). The application, built with Flask and using an Oracle database, needs to be containerized and deployed on OCI to leverage its scalability, performance, and reliability. The migration also includes setting up the necessary network infrastructure, database, and load balancing on OCI.
+# Rasta Serviços de Lanternagem e Pintura
 
-## Solution Summary
-The migration process involves several key steps:
+## Proposta 
+faça um sistema em python para uma oficina mecanica, com cadastro de funcionarios e clientes ordem de serviço com os dados do cliente valor data da entrega e entrada e o valor que sera paga daquele serviço para o funcionario mais os material usado, isso entrará no contas a pagar e o receber será o saldo desta transação. Monte o banco de dados em mysql ou potegress e esse sistema tem q ter intefarce grafica rodar na werb. sera contenerizado em doker e enviada oara o oke na oracle cloud como imagem no registe. Informe todos os arquivos
 
-1. Local Setup:
-* Application Code: The application is written in Python using Flask and connects to an Oracle database.
-* Dockerization: The application is containerized using Docker.
-* Database Initialization: SQL scripts are used to set up the initial database schema.
 
-2. OCI Configuration:
-* Network Setup: Create a Virtual Cloud Network (VCN) with public and private subnets.
-* Security Rules: Configure security lists to control traffic.
-* Autonomous Database: Set up an Oracle Autonomous Database for scalable and managed database services.
-* Kubernetes Cluster: Deploy the application using Oracle Kubernetes Engine (OKE) for container orchestration.
-* Load Balancer: Configure an OCI Load Balancer to distribute traffic across multiple instances.
+## Arquivos necessários:
 
-3. Data Migration:
-* Use Oracle Data Pump to migrate data from the local database to the Oracle Autonomous Database.
+app.py: o arquivo principal do sistema que contém a lógica de negócios e a interface gráfica
+models.py: o arquivo que define os modelos de dados para o banco de dados
+database.py: o arquivo que configura a conexão com o banco de dados
+templates: pasta que contém os arquivos HTML para a interface gráfica
+static: pasta que contém os arquivos estáticos (CSS, JavaScript, etc.)
+requirements.txt: arquivo que lista as dependências do sistema
+Dockerfile: arquivo que define como construir a imagem do sistema em Docker
+docker-compose.yml: arquivo que define como executar o sistema em Docker
 
-4. Deployment:
-* Deploy the containerized application to the OKE cluster.
-* Apply Kubernetes configurations using kubectl.
-
-5. Monitoring and Optimization:
-* Use Oracle Cloud Monitoring for continuous performance tracking.
-* Configure auto-scaling and backup strategies.
+oficina-mecanica/
+app/
+__init__.py
+models.py
+routes.py
+requirements.txt
+templates/
+index.html
+base.html (opcional)
+static/
+css/
+style.css
+js/ (opcional)
+images/ (opcional)
+Dockerfile
+docker-compose.yml
+kubernetes/
+deployment.yaml
+service.yaml
+persistent-volume-claim.yaml
+persistent-volume.yaml
+README.md
