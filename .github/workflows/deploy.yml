@@ -18,17 +18,6 @@ jobs:
       OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
 
     steps:
-    - name: Clone Crossplane Provider for OCI repository
-      run: |
-        git clone https://github.com/oracle-samples/crossplane-provider-oci.git
-        cd crossplane-provider-oci
-
-    - name: Install dependencies
-      run: |
-        go run ./hack/generate-crd.sh
-        go get -u github.com/crossplane/crossplane/cmd/crossplane
-        go get -u github.com/crossplane/crossplane/cmd/kubectl-crossplane
-        
     - name: Configure Kubectl
       uses: oracle-actions/configure-kubectl-oke@v1.5.0
       with:
@@ -36,14 +25,21 @@ jobs:
 
     - name: Checkout code
       uses: actions/checkout@v4.1.7
+      
 
-    - name: Install Crossplane CRDs
-      run: |
-        kubectl apply -f package/crds
+    - name: Adicione um repositório Helm para Crossplane.
+      run: helm repo add crossplane-stable https://charts.crossplane.io/stable
 
-    - name: Install OCI Provider CRDs
+    - name: Atualize o repositório Helm
+      run: helm repo update
+
+    - name: Install Crossplane via Helm
+      run: helm upgrade crossplane --namespace crossplane-system crossplane-stable/crossplane --create-namespace
+     #  run: helm install my-crossplane --namespace crossplane-system crossplane-stable/crossplane --create-namespace - se não tivesse um criado
+
+    - name: Registre os CRDs no seu cluster Kubernetes
       run: |
-        kubectl apply -f https://raw.githubusercontent.com/crossplane-contrib/provider-oci/master/config/crd/bases/oci.upbound.io_providerconfigs.yaml
+        kubectl apply -f https://raw.githubusercontent.com/crossplane/crossplane/master/install.yaml
 
     - name: Configure OCI Provider
       run: |
