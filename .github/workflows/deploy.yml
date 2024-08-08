@@ -37,7 +37,7 @@ jobs:
       run: helm repo update
 
     - name: Install Crossplane via Helm
-      run: helm install crossplane-new --namespace crossplane-system crossplane-stable/crossplane --create-namespace
+      run: helm install crossplane --namespace crossplane-system crossplane-stable/crossplane --create-namespace
 
     - name: Configure OCI Provider
       run: |
