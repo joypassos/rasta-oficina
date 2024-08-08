@@ -1,44 +1,46 @@
-name: Deploy Kubernetes
+name: Deploy OCI Resources with Crossplane
+
 on:
   push:
     branches: 
-       - 'main'
+       - feat/crossplane
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build and publish Docker image
+  install:
+    name: Install CrossPlane
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v4.1.7
       
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3.6.1
-      
-    - name: Login to Oracle Cloud Infrastructure Registry (OCIR)
-      run: |
-        echo "${{ secrets.OCI_AUTH_TOKEN }}" | docker login -u "${{ secrets.OCI_NAMESPACE }}/${{ secrets.OCI_USER_MAIL }}" ${{ secrets.OCI_REGION }}.ocir.io --password-stdin     
-
-    - name: Build Docker image
-      uses: docker/build-push-action@v6
+    - name: Configure Kubectl
+      uses: oracle-actions/configure-kubectl-oke@v1.5.0
       with:
-        platforms: linux/arm64
-        context: app
-        file: app/Dockerfile
-        tags: ${{ secrets.OCI_REGION }}.ocir.io/${{ secrets.OCI_NAMESPACE }}/${{ secrets.NAME_REPO }}/my-survey-app:latest
-        push: false
-        load: true
-        cache-from: type=gha
-        cache-to: type=gha,mode=max   
-        
-    - name: Push Docker Image to Oracle Cloud Registry
+        cluster: ${{ secrets.OKE_CLUSTER_OCID }}
+      
+    - name: Install Crossplane CLI
+      run: curl -sL https://raw.githubusercontent.com/crossplane/crossplane/master/install.sh | sh
+
+    - name: Configure OCI Provider
+      env:
+        OCI_CLI_USER: ${{ secrets.OCI_USER_OCID }}
+        OCI_CLI_TENANCY: ${{ secrets.OCI_TENANCY_OCID }}
+        OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
+        OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
+        OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
       run: |
-        docker push ${{ secrets.OCI_REGION }}.ocir.io/${{ secrets.OCI_NAMESPACE }}/${{ secrets.NAME_REPO }}/my-survey-app:latest 
+        kubectl crossplane install provider crossplane/provider-oci:latest
+        kubectl create secret generic oci-creds -n crossplane-system \
+          --from-literal=user_ocid=${OCI_CLI_USER} \
+          --from-literal=tenancy_ocid=${OCI_CLI_TENANCY} \
+          --from-literal=fingerprint=${OCI_CLI_FINGERPRINT} \
+          --from-literal=private_key=${OCI_CLI_KEY_CONTENT} \
+          --from-literal=region=${OCI_CLI_REGION} 
 
   deploy:
-    needs: build
-    name: Deploy container image to an OKE Cluster
+    needs: install
+    name: Apply Object Storage Bucket Configuration 
     runs-on: ubuntu-latest
     env:
       OCI_CLI_USER: ${{ secrets.OCI_USER_OCID }}
@@ -60,5 +62,4 @@ jobs:
     - name: Deploy to Kubernetes
       run: |
         envsubst < kubernetes/deployment.yaml | kubectl apply -f -
-        envsubst < kubernetes/service.yaml | kubectl apply -f -
-        envsubst < kubernetes/persistent-volume-claim.yaml | kubectl apply -f -
+        envsubst < examples/objectstorage/bucket.yaml | kubectl apply -f -
