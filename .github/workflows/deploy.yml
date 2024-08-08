@@ -39,14 +39,15 @@ jobs:
 
     - name: Configure OCI Provider
       run: |
-        kubectl apply -f examples/providerconfig/secret.yaml
-        kubectl apply -f examples/providerconfig/providerconfig.yaml
         kubectl create secret generic oci-creds -n crossplane-system \
           --from-literal=user_ocid=${OCI_CLI_USER} \
           --from-literal=tenancy_ocid=${OCI_CLI_TENANCY} \
           --from-literal=fingerprint=${OCI_CLI_FINGERPRINT} \
           --from-literal=private_key=${OCI_CLI_KEY_CONTENT} \
-          --from-literal=region=${OCI_CLI_REGION}
+          --from-literal=region=${OCI_CLI_REGION} | \
+        kubectl patch secret oci-creds -n crossplane-system -p='{"stringData":{"credentials": "{\"user_ocid\": \"${OCI_CLI_USER}\", \"tenancy_ocid\": \"${OCI_CLI_TENANCY}\", \"fingerprint\": \"${OCI_CLI_FINGERPRINT}\", \"private_key\": \"${OCI_CLI_KEY_CONTENT}\", \"region\": \"${OCI_CLI_REGION}\"}"}}'
+        kubectl apply -f examples/providerconfig/secret.yaml
+        kubectl apply -f examples/providerconfig/providerconfig.yaml
 
   deploy:
     needs: install
