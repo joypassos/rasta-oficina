@@ -25,10 +25,10 @@ jobs:
 
     - name: Install dependencies
       run: |
-        make generate
+        go run ./hack/generate-crd.sh
         go get -u github.com/crossplane/crossplane/cmd/crossplane
         go get -u github.com/crossplane/crossplane/cmd/kubectl-crossplane
-
+        
     - name: Configure Kubectl
       uses: oracle-actions/configure-kubectl-oke@v1.5.0
       with:
