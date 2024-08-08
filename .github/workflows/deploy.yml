@@ -16,7 +16,6 @@ jobs:
       OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
       OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
       OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
-      OCI_REGION: ${{ secrets.OCI_REGION }}.ocir.io
 
     steps:
     - name: Configure Kubectl
@@ -37,12 +36,6 @@ jobs:
       run: helm install crossplane --namespace crossplane-system crossplane-stable/crossplane --create-namespace
 
     - name: Configure OCI Provider
-      env:
-        OCI_CLI_USER: ${{ secrets.OCI_USER_OCID }}
-        OCI_CLI_TENANCY: ${{ secrets.OCI_TENANCY_OCID }}
-        OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
-        OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
-        OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
       run: |
         kubectl apply -f examples/providerconfig/secret.yaml
         kubectl apply -f examples/providerconfig/providerconfig.yaml
