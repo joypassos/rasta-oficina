@@ -27,8 +27,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4.1.7
       
-    - name: Install Crossplane CLI
-      run: curl -sL https://raw.githubusercontent.com/crossplane/crossplane/master/install.sh | sh
+    - name: Add Helm repository for Crossplane
+      run: helm repo add crossplane-stable https://charts.crossplane.io/stable
+
+    - name: Update Helm repositories
+      run: helm repo update
+
+    - name: Install Crossplane via Helm
+      run: helm install crossplane --namespace crossplane-system crossplane-stable/crossplane --create-namespace
 
     - name: Configure OCI Provider
       env:
@@ -38,13 +44,13 @@ jobs:
         OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
         OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
       run: |
-        kubectl crossplane install provider crossplane/provider-oci:latest
+        kubectl apply -f https://raw.githubusercontent.com/oracle-samples/crossplane-provider-oci/main/install.yaml
         kubectl create secret generic oci-creds -n crossplane-system \
           --from-literal=user_ocid=${OCI_CLI_USER} \
           --from-literal=tenancy_ocid=${OCI_CLI_TENANCY} \
           --from-literal=fingerprint=${OCI_CLI_FINGERPRINT} \
           --from-literal=private_key=${OCI_CLI_KEY_CONTENT} \
-          --from-literal=region=${OCI_CLI_REGION} 
+          --from-literal=region=${OCI_CLI_REGION}
 
   deploy:
     needs: install
@@ -68,6 +74,5 @@ jobs:
       uses: actions/checkout@v4.1.7
             
     - name: Deploy to Kubernetes
-      run: |
-        envsubst < kubernetes/deployment.yaml | kubectl apply -f -
+      run: |        
         envsubst < examples/objectstorage/bucket.yaml | kubectl apply -f -
