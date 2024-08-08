@@ -26,14 +26,18 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4.1.7
       
-    - name: Add Helm repository for Crossplane
+    - name: Create namespace
+      run: | 
+        kubectl create namespace crossplane-system || echo "Namespace already exists"
+
+    - name: Adicione um repositório Helm para Crossplane.
       run: helm repo add crossplane-stable https://charts.crossplane.io/stable
 
-    - name: Update Helm repositories
+    - name: Atualize o repositório Helm
       run: helm repo update
 
     - name: Install Crossplane via Helm
-      run: helm install crossplane --namespace crossplane-system crossplane-stable/crossplane --create-namespace
+      run: helm install crossplane-new --namespace crossplane-system crossplane-stable/crossplane --create-namespace
 
     - name: Configure OCI Provider
       run: |
