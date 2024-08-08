@@ -44,7 +44,8 @@ jobs:
         OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
         OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
       run: |
-        kubectl apply -f https://raw.githubusercontent.com/oracle-samples/crossplane-provider-oci/main/install.yaml
+        kubectl apply -f examples/providerconfig/secret.yaml
+        kubectl apply -f examples/providerconfig/providerconfig.yaml
         kubectl create secret generic oci-creds -n crossplane-system \
           --from-literal=user_ocid=${OCI_CLI_USER} \
           --from-literal=tenancy_ocid=${OCI_CLI_TENANCY} \
