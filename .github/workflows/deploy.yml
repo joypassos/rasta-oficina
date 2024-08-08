@@ -37,16 +37,13 @@ jobs:
       run: helm upgrade crossplane --namespace crossplane-system crossplane-stable/crossplane --create-namespace
      #  run: helm install my-crossplane --namespace crossplane-system crossplane-stable/crossplane --create-namespace - se não tivesse um criado
 
-    - name: Registre os CRDs no seu cluster Kubernetes
-      run: |
-        kubectl apply -f https://raw.githubusercontent.com/crossplane/crossplane/master/install.yaml
-
     - name: Configure OCI Provider
       run: |
         kubectl create secret generic oci-creds -n crossplane-system \
-          --from-literal=credentials=$(echo -n "${OCI_CLI_USER}:${OCI_CLI_TENANCY}:${OCI_CLI_FINGERPRINT}:${OCI_CLI_KEY_CONTENT}:${OCI_CLI_REGION}" | base64)
+           --from-literal=credentials=$(echo -n "${OCI_CLI_USER}:${OCI_CLI_TENANCY}:${OCI_CLI_FINGERPRINT}:${OCI_CLI_KEY_CONTENT}:${OCI_CLI_REGION}" | base64)
         kubectl apply -f examples/providerconfig/secret.yaml
         kubectl apply -f examples/providerconfig/providerconfig.yaml
+
   deploy:
     needs: install
     name: Apply Object Storage Bucket Configuration 
