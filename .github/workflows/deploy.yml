@@ -26,9 +26,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4.1.7
       
-    - name: Create namespace
-      run: | 
-        kubectl create namespace crossplane-system || echo "Namespace already exists"
 
     - name: Adicione um repositório Helm para Crossplane.
       run: helm repo add crossplane-stable https://charts.crossplane.io/stable
