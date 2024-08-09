@@ -37,7 +37,15 @@ jobs:
       run: helm upgrade crossplane --namespace crossplane-system crossplane-stable/crossplane --create-namespace
      #  run: helm install my-crossplane --namespace crossplane-system crossplane-stable/crossplane --create-namespace - se não tivesse um criado
 
-    - name: Configure OCI Provider
+    - name: Create oci-creds secret
+      run: |
+        bash -e create-secret.sh
+
+    - name: Install CRDs
+      run: |
+        kubectl apply -f install.yaml
+
+    - name: Apply provider config
       run: |
         kubectl apply -f examples/providerconfig/secret.yaml
         kubectl apply -f examples/providerconfig/providerconfig.yaml
