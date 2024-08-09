@@ -40,7 +40,7 @@ jobs:
     - name: Install Kustomize
       run: |
         curl -s https://kustomize.io/install.sh | sh
-        export PATH=$PATH:$HOME/kustomize/bi
+        export PATH=$PATH:$HOME/kustomize/bin
 
     - name: Install CRDs
       run: |
