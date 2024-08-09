@@ -2,8 +2,8 @@ name: Deploy OCI Resources with Crossplane
 
 on:
   push:
-    branches: 
-       - feat/crossplane
+    branches:
+      - feat/crossplane
   workflow_dispatch:
 
 jobs:
@@ -25,26 +25,20 @@ jobs:
 
     - name: Checkout code
       uses: actions/checkout@v4.1.7
-      
 
-    - name: Adicione um repositório Helm para Crossplane.
-      run: helm repo add crossplane-stable https://charts.crossplane.io/stable
-
-    - name: Atualize o repositório Helm
-      run: helm repo update
-
-    - name: Install Crossplane via Helm
-      run: helm upgrade crossplane --namespace crossplane-system crossplane-stable/crossplane --create-namespace
-     #  run: helm install my-crossplane --namespace crossplane-system crossplane-stable/crossplane --create-namespace - se não tivesse um criado
+    - name: Clone Crossplane repository
+      run: git clone https://github.com/crossplane/crossplane.git
 
     - name: Install Kustomize
-      run: |
-        curl -s https://kustomize.io/install.sh | sh
-        export PATH=$PATH:$HOME/kustomize/bin
+      run: sudo snap install kustomize
 
     - name: Install CRDs
       run: |
-        kustomize build . | kubectl apply -f -
+        kustomize build config/crds.yaml | kubectl apply -f -
+
+    - name: Create oci-creds secret
+      run: |
+        kubectl create secret generic oci-creds -n crossplane-system --from-literal=credentials=$(echo -n "${OCI_CLI_USER}:${OCI_CLI_TENANCY}:${OCI_CLI_FINGERPRINT}:${OCI_CLI_KEY_CONTENT}:${OCI_CLI_REGION}" | base64)
 
     - name: Apply provider config
       run: |
@@ -53,7 +47,7 @@ jobs:
 
   deploy:
     needs: install
-    name: Apply Object Storage Bucket Configuration 
+    name: Apply Object Storage Bucket Configuration
     runs-on: ubuntu-latest
     env:
       OCI_CLI_USER: ${{ secrets.OCI_USER_OCID }}
@@ -68,10 +62,10 @@ jobs:
       uses: oracle-actions/configure-kubectl-oke@v1.5.0
       with:
         cluster: ${{ secrets.OKE_CLUSTER_OCID }}
-        
+
     - name: Checkout
       uses: actions/checkout@v4.1.7
-            
+
     - name: Deploy to Kubernetes
-      run: |        
+      run: |
         envsubst < examples/objectstorage/bucket.yaml | kubectl apply -f -
