@@ -18,34 +18,30 @@ jobs:
       OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4.1.7
-
-    - name: Clone Crossplane repository
-      run: |
-        git clone https://github.com/crossplane/crossplane.git
-        cd crossplane
-        go get -u github.com/crossplane/crossplane/cmd/crossplane
-        go get -u github.com/crossplane/crossplane/cmd/kubectl-crossplane
-
-    - name: Generate CRDs
-      run: |
-        make generate
-
-    - name: Apply CRDs
-      run: |
-        kubectl apply -f install.yaml
-
     - name: Configure Kubectl
       uses: oracle-actions/configure-kubectl-oke@v1.5.0
       with:
         cluster: ${{ secrets.OKE_CLUSTER_OCID }}
 
+    - name: Checkout code
+      uses: actions/checkout@v4.1.7
+      
+
+    - name: Adicione um repositório Helm para Crossplane.
+      run: helm repo add crossplane-stable https://charts.crossplane.io/stable
+
+    - name: Atualize o repositório Helm
+      run: helm repo update
+
+    - name: Install Crossplane via Helm
+      run: helm upgrade crossplane --namespace crossplane-system crossplane-stable/crossplane --create-namespace
+     #  run: helm install my-crossplane --namespace crossplane-system crossplane-stable/crossplane --create-namespace - se não tivesse um criado
+
     - name: Create oci-creds secret
       run: |
         bash -e create-secret.sh
 
-    - name: Apply provider config
+    - name: Configure OCI Provider
       run: |
         kubectl apply -f examples/providerconfig/secret.yaml
         kubectl apply -f examples/providerconfig/providerconfig.yaml
@@ -59,7 +55,7 @@ jobs:
       OCI_CLI_TENANCY: ${{ secrets.OCI_TENANCY_OCID }}
       OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
       OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
-      OCI_CLI_REGION: ${{ secrets.OCI_REGION }}
+      OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
       OCI_REGION: ${{ secrets.OCI_REGION }}.ocir.io
 
     steps:
@@ -67,7 +63,7 @@ jobs:
       uses: oracle-actions/configure-kubectl-oke@v1.5.0
       with:
         cluster: ${{ secrets.OKE_CLUSTER_OCID }}
-
+        
     - name: Checkout
       uses: actions/checkout@v4.1.7
             
